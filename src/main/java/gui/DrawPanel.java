@@ -31,7 +31,7 @@ public class DrawPanel extends JPanel implements MouseListener, MouseMotionListe
 
     public static final int MARK_RADIUS = 3;
     public static final double MIN_ZOOM = 0.1;
-    public static final int PADDING = 10;
+    public static final int PADDING = 100;
 
 
     /**

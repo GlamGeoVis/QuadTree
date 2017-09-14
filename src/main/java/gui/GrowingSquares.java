@@ -51,8 +51,9 @@ public class GrowingSquares extends JFrame {
 
         this.g = g;
         this.view = null;
-        this.tree = new QuadTree(DrawPanel.PADDING, DrawPanel.PADDING,
-                w - DrawPanel.PADDING * 2, h - DrawPanel.PADDING * 2, g);
+        /*this.tree = new QuadTree(DrawPanel.PADDING, DrawPanel.PADDING,
+                w - DrawPanel.PADDING * 2, h - DrawPanel.PADDING * 2, g);*/
+        this.tree = new QuadTree(0, 0, 100, 100, g);
         this.clusterer = new AgglomerativeClustering(tree, g);
         this.drawPanel = new DrawPanel(tree);
         add(drawPanel, BorderLayout.CENTER);
@@ -122,7 +123,9 @@ public class GrowingSquares extends JFrame {
         tree.reset();
         clusterer.cluster(!DEBUG, DEBUG);
         if (clusterer.getClustering() != null) {
-            view = new HierarchicalClustering.View(clusterer.getClustering());
+        	HierarchicalClustering clustering = clusterer.getClustering();
+        	PointIO.printClustering(clustering);
+            view = new HierarchicalClustering.View(clustering);
             view.next(); // show first step that has actual squares
             drawPanel.setSquares(view.getSquares(g));
         }
@@ -182,7 +185,7 @@ public class GrowingSquares extends JFrame {
                             + "Load a new random set of squares.<br>"
                         + "<b><code>A</code></b> - "
                             + "Execute clustering algorithm.<br>"
-                        + "<b><code>←</code></b> - "
+                        + "<b><code>�?</code></b> - "
                             + "View previous step of clustering.<br>"
                         + "<b><code>→</code></b> - "
                             + "View next step of clustering.<br>"

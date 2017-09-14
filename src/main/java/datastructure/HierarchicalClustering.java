@@ -68,6 +68,10 @@ public class HierarchicalClustering implements Comparable<HierarchicalClustering
     public HierarchicalClustering getMergedInto() {
         return mergedInto;
     }
+    
+    public Set<HierarchicalClustering> getCreatedFrom() {
+        return createdFrom;
+    }
 
     public Square getSquare() {
         return square;
@@ -120,8 +124,8 @@ public class HierarchicalClustering implements Comparable<HierarchicalClustering
      */
     public static class View {
 
-        private Queue<HierarchicalClustering> next;
-        private Queue<HierarchicalClustering> prev;
+        private Queue<HierarchicalClustering> nextQueue;
+        private Queue<HierarchicalClustering> prevQueue;
         private Set<HierarchicalClustering> curr;
         /**
          * A view can make half steps, wherein the situation right before a merge
@@ -138,13 +142,13 @@ public class HierarchicalClustering implements Comparable<HierarchicalClustering
             }
             this.curr = new HashSet<>();
             this.curr.add(clustering);
-            this.prev = new PriorityQueue<>();
+            this.prevQueue = new PriorityQueue<>();
             if (clustering.createdFrom != null) {
-                this.prev.add(clustering);
+                this.prevQueue.add(clustering);
             }
-            this.next = new PriorityQueue<>();
+            this.nextQueue = new PriorityQueue<>();
             if (clustering.mergedInto != null) {
-                this.next.add(clustering.mergedInto);
+                this.nextQueue.add(clustering.mergedInto);
             }
 
             this.n = 0;
@@ -169,7 +173,7 @@ public class HierarchicalClustering implements Comparable<HierarchicalClustering
             int i = 0;
             double maxAt = Double.NEGATIVE_INFINITY;
             if (halfStep) {
-                maxAt = next.peek().at;
+                maxAt = nextQueue.peek().at;
             } else {
                 for (HierarchicalClustering node : curr) {
                     if (node.at > maxAt) {
@@ -188,7 +192,7 @@ public class HierarchicalClustering implements Comparable<HierarchicalClustering
          * cluster will be viewed.
          */
         public void end() {
-            while (!next.isEmpty()) {
+            while (!nextQueue.isEmpty()) {
                 next();
             }
         }
@@ -197,14 +201,17 @@ public class HierarchicalClustering implements Comparable<HierarchicalClustering
          * Move the view to the next step, meaning that one merge is performed.
          */
         public void next() {
-            if (!halfStep && next.size() > 0 &&
-                    (next.peek().createdFrom == null ||
-                    next.peek().createdFrom.size() > 1)) {
+            if (!halfStep && nextQueue.size() > 0 &&
+                    (nextQueue.peek().createdFrom == null ||
+                    nextQueue.peek().createdFrom.size() > 1)) {
                 halfStep = true;
                 step();
                 return;
             }
-            HierarchicalClustering node = next.poll();
+            HierarchicalClustering node = nextQueue.poll();
+            System.out.println("Poll next node: ");
+            System.out.println(node);
+            System.out.println("=======================================");
             if (node == null) {
                 return;
             }
@@ -212,13 +219,13 @@ public class HierarchicalClustering implements Comparable<HierarchicalClustering
             if (node.createdFrom != null) {
                 for (HierarchicalClustering from : node.createdFrom) {
                     curr.remove(from);
-                    prev.remove(from);
+                    prevQueue.remove(from);
                 }
-                prev.add(node);
+                prevQueue.add(node);
             }
             curr.add(node);
-            if (node.mergedInto != null && !next.contains(node.mergedInto)) {
-                next.add(node.mergedInto);
+            if (node.mergedInto != null && !nextQueue.contains(node.mergedInto)) {
+                nextQueue.add(node.mergedInto);
             }
             step();
         }
@@ -232,25 +239,25 @@ public class HierarchicalClustering implements Comparable<HierarchicalClustering
                 step();
                 return;
             }
-            HierarchicalClustering node = prev.poll();
+            HierarchicalClustering node = prevQueue.poll();
             if (node == null) {
                 return;
             }
             curr.remove(node);
             if (node.mergedInto != null) {
-                next.remove(node.mergedInto);
+                nextQueue.remove(node.mergedInto);
             }
-            next.add(node);
+            nextQueue.add(node);
             // only nodes that have a createdFrom should ever be added to prev
             // hence, no null check is needed
             for (HierarchicalClustering from : node.createdFrom) {
                 curr.add(from);
                 if (from.createdFrom != null) {
-                    prev.add(from);
+                    prevQueue.add(from);
                 }
             }
-            if (prev.size() > 0 && (prev.peek().createdFrom == null ||
-                    prev.peek().createdFrom.size() > 1)) {
+            if (prevQueue.size() > 0 && (prevQueue.peek().createdFrom == null ||
+                    prevQueue.peek().createdFrom.size() > 1)) {
                 halfStep = true;
             }
             step();
@@ -261,7 +268,7 @@ public class HierarchicalClustering implements Comparable<HierarchicalClustering
          * will be disjoint.
          */
         public void start() {
-            while (!prev.isEmpty()) {
+            while (!prevQueue.isEmpty()) {
                 previous();
             }
         }

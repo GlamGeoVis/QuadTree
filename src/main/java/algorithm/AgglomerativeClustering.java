@@ -64,6 +64,9 @@ public class AgglomerativeClustering {
      */
     public AgglomerativeClustering cluster(boolean multiMerge,
             boolean includeOutOfCell) {
+    	System.out.println("Clustering starting...");
+    	double target_time = 1.0; // the_time_we_are_interested_in 
+    	
         // construct a queue, put everything in there
         PriorityQueue<Event> q = new PriorityQueue<>();
         // also create a result for each square, and a map to find them
@@ -88,15 +91,31 @@ public class AgglomerativeClustering {
                 alive.add(squares[i]);
             }
         }
+        System.out.println("Alives (At the beginning)");
+        System.out.println(alive);
+        
+        Set<Square> candidateAlives = null;
+        double candidateTime = 0.0;
+        
         // merge squares until no pairs to merge remain
         queue: while (!q.isEmpty() && alive.size() > 1) {
             Event e = q.poll();
             // we ignore this event if not all squares from it are alive anymore
             for (Square square : e.getSquares()) {
                 if (!alive.contains(square)) {
+                	System.out.println("Event ignored (t=" + e.getAt() + ")");
                     continue queue;
                 }
             }
+            System.out.println("Alives (t=" + e.getAt() + ")");
+            System.out.println(alive);
+            if(e.getAt() <= target_time) {
+            	// Keep track of last candidate event
+            	candidateAlives = new HashSet<>();
+            	candidateAlives.addAll(alive);
+            	candidateTime = e.getAt();
+            }
+            
             // depending on the type of event, handle it appropriately
             switch (e.getType()) {
             case MERGE:
@@ -198,6 +217,14 @@ public class AgglomerativeClustering {
                 break;
             }
         }
+        System.out.println("======================");
+        System.out.println("candidateAlives");
+        System.out.println(candidateAlives);
+        
+        System.out.println("candidateTime");
+        System.out.println(candidateTime);
+        System.out.println("======================");
+
         return this;
     }
 
