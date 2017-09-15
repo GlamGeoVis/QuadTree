@@ -73,12 +73,13 @@ public class AgglomerativeClustering {
         Map<Square, HierarchicalClustering> map = new HashMap<>();
         // finally, create an indication of which squares still participate
         Set<Square> alive = new HashSet<>();
+              
         for (QuadTree leaf : tree.leaves()) {
             Square[] squares = leaf.getSquares().toArray(new Square[0]);
             for (int i = 0; i < squares.length; ++i) {
                 // add events for when two squares in the same cell touch
                 for (int j = i + 1; j < squares.length; ++j) {
-                    q.add(new SquareMerge(squares[i], squares[j], g));
+                    q.add(new SquareMerge(squares[i], squares[j], g));                 
                 }
 
                 // add events for when a square grows out of its cell
@@ -103,12 +104,12 @@ public class AgglomerativeClustering {
             // we ignore this event if not all squares from it are alive anymore
             for (Square square : e.getSquares()) {
                 if (!alive.contains(square)) {
-                	System.out.println("Event ignored (t=" + e.getAt() + ")");
+               // 	System.out.println("Event ignored (t=" + e.getAt() + ")");
                     continue queue;
                 }
             }
-            System.out.println("Alives (t=" + e.getAt() + ")");
-            System.out.println(alive);
+           // System.out.println("Alives (t=" + e.getAt() + ")");
+            //System.out.println(alive);
             if(e.getAt() <= target_time) {
             	// Keep track of last candidate event
             	candidateAlives = new HashSet<>();

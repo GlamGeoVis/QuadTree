@@ -30,9 +30,11 @@ public class HierarchicalClustering implements Comparable<HierarchicalClustering
         if (at < 0) {
             throw new IllegalArgumentException();
         }
-
+        
         this.square = square;
         this.at = at;
+        
+       				
         if (createdFrom.length == 0) {
             this.createdFrom = null;
         } else {

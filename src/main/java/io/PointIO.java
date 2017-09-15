@@ -5,6 +5,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 import java.util.Set;
 
@@ -17,11 +19,14 @@ public class PointIO {
 
     public static void read(File file, QuadTree tree) {
         try (Scanner reader = new Scanner(new FileInputStream(file))) {
-            while (reader.hasNextDouble()) {
-                tree.insertCenterOf(new Square(reader.nextDouble(),
-                        reader.nextDouble(), reader.nextInt(10)));
+            while (reader.hasNextDouble()) { 
+            	System.out.println("Read input file");
+            	tree.insertCenterOf(new Square(reader.nextDouble(),
+                        reader.nextDouble(), reader.nextInt(10),
+                        reader.next())
+                        );// read next string value for book genre
             }
-            System.out.println(tree);
+            System.out.println("This is the tree: "+ tree);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
